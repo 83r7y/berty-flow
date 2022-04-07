@@ -1,0 +1,21 @@
+{
+    "device": "cuda:0",
+
+    "max_seq_len": 1000,
+    "encoder_hidden": 256,
+    "encoder_layer": 4,
+    "encoder_head": 2,
+    "decoder_hidden": 256,
+    "decoder_layer": 4,
+    "decoder_head": 2,
+    "fft_conv1d_filter_size": 1024,
+    "fft_conv1d_kernel_size": [9, 1],
+    "encoder_dropout": 0.2,
+    "decoder_dropout": 0.2,
+    "n_mel_channels": 80,
+
+    "variance_predictor_filter_size": 256,
+    "variance_predictor_kernel_size": 3,
+    "variance_predictor_dropout": 0.5
+}
+

@@ -1,0 +1,13 @@
+{
+    "device": "cuda:0",
+    "video_path": "data/moon.jpeg",
+    "audio_path": "data/moon.wav",
+    "wav2lip_batch_size": 128,
+    "face_detection_batch_size": 16,
+    "face_detection_ckpt": "../../data/wav2lip_models/s3fd-619a316812.pth",
+    "wav2lip_ckpt": "../../data/wav2lip_models/wav2lip.pth",
+    "face_pads": [0, 10, 0, 0],
+    "wav2lip_img_size": 96,
+    "output_path": "result.mp4"
+}
+

@@ -27,12 +27,16 @@ class BaseModel(ABC):
         ...
 
     @abstractmethod
+    def eval_unseen_data(self, tot_res_dict):
+        ...
+
+    @abstractmethod
     def configure_optimizers(self):
         ...
 
     # TODO need some modification
     def save_user_specific_data(self, save_dict):
-        pass
+        ...
 
 
 class BaseDataset(ABC):

@@ -45,7 +45,8 @@ class BertKlueNli(torch.nn.Module, BaseModel):
         # tokenize sentences
         tk_res = self.tk(text=batch['premise'], text_pair=batch['hypothesis'],
                          padding=True, return_tensors='pt',
-                         max_length=self.bert_cfg.max_position_embeddings)
+                         max_length=self.bert_cfg.max_position_embeddings,
+                         truncation=True)
 
         for key in tk_res:
             batch[key] = tk_res[key].to(device)
@@ -62,17 +63,24 @@ class BertKlueNli(torch.nn.Module, BaseModel):
     def training_step(self, batch:dict, batch_idx:int, opt_idx:int):
         logits = self.forward(batch)
         loss = self.loss(logits, batch['label'])
-        return loss
+        res_dict = {'loss': loss}
+        return res_dict
 
     def validation_step(self, batch:dict, batch_idx:int):
         logits = self.forward(batch)
         loss = self.loss(logits, batch['label'])
-        return loss
+        res_dict = {'loss': loss, 'gt':batch['label'], 'logits':logits}
+        return res_dict
 
     def test_step(self, batch:dict, batch_idx:int):
         logits = self.forward(batch)
         loss = self.loss(logits, batch['label'])
-        return loss
+        res_dict = {'loss': loss, 'gt':batch['label'], 'logits':logits}
+        return res_dict
+
+    def eval_unseen_data(self, tot_res_dict):
+        import pdb
+        pdb.set_trace()
 
     def configure_optimizers(self):
         opt = optim.Adam(self.parameters(), lr=self.config['trainer']['learning_rate'])

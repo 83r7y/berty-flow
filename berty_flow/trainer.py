@@ -139,7 +139,7 @@ class Trainer:
                 if sch is not None:
                     sch.load_state_dict(sch_state)
 
-        best_loss = np.inf
+        best_criterion = np.inf
         for epoch in range(cnt_epoch, cfg['trainer']['max_epochs']):
             model.train()
             tqdm_ins = tqdm(train_data,
@@ -150,9 +150,9 @@ class Trainer:
                 for opt_idx, optimizer in zip(range(len(optimizers)), optimizers):
                     optimizer.zero_grad()
                     # training step
-                    loss = model.training_step(batch, batch_idx, opt_idx)
-                    tqdm_ins.set_postfix({'train_loss': '%7.4f' % loss})
-                    loss.backward()
+                    res_dict = model.training_step(batch, batch_idx, opt_idx)
+                    tqdm_ins.set_postfix({'train_loss': '%7.4f' % res_dict['loss']})
+                    res_dict['loss'].backward()
                     if dist_train:
                         self.average_gradients(model)
 
@@ -168,14 +168,17 @@ class Trainer:
             model.eval()
             if rank == 0 or not dist_train:
                 # compute avg loss
-                tot_loss = list()
-                for batch_idx, batch in enumerate(tqdm(valid_data, disable=(rank != 0))):
-                    loss = model.validation_step(batch, batch_idx)
-                    tot_loss.append(loss.item())
-                avg_loss = np.mean(np.array(tot_loss))
+                tot_res_dict = list()
+                with torch.no_grad():
+                    for batch_idx, batch in enumerate(tqdm(valid_data, disable=(rank != 0))):
+                        res_dict = model.validation_step(batch, batch_idx)
+                        tot_res_dict.append(res_dict)
+
+                # evaluate unseen data
+                avg_criterion = model.eval_unseen_data(tot_res_dict)
 
                 # save best checkpoint
-                if best_loss > avg_loss:
+                if best_criterion > avg_criterion:
                     # save
                     save_dict = dict(
                             epoch=epoch,
@@ -186,11 +189,11 @@ class Trainer:
                         save_dict['lr_schedulers']=[scheduler.state_dict() for scheduler in schedulers]
                     model.save_user_specific_data(save_dict) 
                     torch.save(save_dict, '%s/epoch=%02d-val_loss=%8.6f.ckpt' % (self.config['output_dir'],
-                                                                                 epoch, avg_loss))
-                    best_loss = avg_loss
+                                                                                 epoch, avg_criterion))
+                    best_criterion = avg_criterion
 
-                print('%dth epoch, average validation loss: %7.4f, best_loss: %7.4f' %\
-                        (epoch, avg_loss, best_loss))
+                print('%dth epoch, average validation loss: %7.4f, best_criterion: %7.4f' %\
+                        (epoch, avg_criterion, best_criterion))
 
             if dist_train:
                 dist.barrier()

@@ -6,9 +6,9 @@ import random
 import numpy as np
 import torch
 
-from pytorch_berty.trainer import training_prologue, make_output_dir, Trainer
-from pytorch_berty.datasets.klue_nli import KlueNli
-from pytorch_berty.models.bert_klue_nli import BertKlueNli
+from berty_flow.trainer import training_prologue, make_output_dir, Trainer
+from berty_flow.datasets.klue_nli import KlueNli
+from berty_flow.models.bert_klue_nli import BertKlueNli
 
 
 def main():

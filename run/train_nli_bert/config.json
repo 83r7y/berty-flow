@@ -2,13 +2,13 @@
     "model_module": "zero_shot_diagnosis_classifier",
     "model_name": "monologg/kobert",
     "output_dir": "output",
-    "batch_size": 32,
+    "batch_size": 16,
     "dataset": {
         "train_path": "../../data/klue_benchmark/klue-nli-v1/klue-nli-v1_train.json",
         "dev_path": "../../data/klue_benchmark/klue-nli-v1/klue-nli-v1_dev.json"
     },
     "trainer": {
-        "n_gpus": 8,
+        "n_gpus": 1,
         "master_addr": "127.0.0.1",
         "master_port": "6151",
         "seed": 6150,

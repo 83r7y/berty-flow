@@ -78,9 +78,22 @@ class BertKlueNli(torch.nn.Module, BaseModel):
         res_dict = {'loss': loss, 'gt':batch['label'], 'logits':logits}
         return res_dict
 
-    def eval_unseen_data(self, tot_res_dict):
-        import pdb
-        pdb.set_trace()
+    def eval_unseen_data(self, tot_res_dict, epoch):
+        tot_loss = 0.0
+        tot_tp = 0
+        tot_num_exs = 0
+        for batch_res in tot_res_dict:
+            batch_size = len(batch_res['gt'])
+            tp = (torch.argmax(batch_res['logits'], dim=1) == batch_res['gt']).sum().item()
+
+            tot_loss += batch_size * batch_res['loss'].item()
+            tot_tp += tp
+            tot_num_exs += batch_size
+        avg_loss = tot_loss / tot_num_exs
+        acc = tot_tp / tot_num_exs
+        print('%dth epoch, average validation loss: %7.4f, accuracy: %7.4f' %\
+                (epoch, avg_loss, acc))
+        return avg_loss
 
     def configure_optimizers(self):
         opt = optim.Adam(self.parameters(), lr=self.config['trainer']['learning_rate'])

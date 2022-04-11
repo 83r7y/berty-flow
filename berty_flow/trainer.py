@@ -175,7 +175,7 @@ class Trainer:
                         tot_res_dict.append(res_dict)
 
                 # evaluate unseen data
-                avg_criterion = model.eval_unseen_data(tot_res_dict)
+                avg_criterion = model.eval_unseen_data(tot_res_dict, epoch)
 
                 # save best checkpoint
                 if best_criterion > avg_criterion:
@@ -191,9 +191,6 @@ class Trainer:
                     torch.save(save_dict, '%s/epoch=%02d-val_loss=%8.6f.ckpt' % (self.config['output_dir'],
                                                                                  epoch, avg_criterion))
                     best_criterion = avg_criterion
-
-                print('%dth epoch, average validation loss: %7.4f, best_criterion: %7.4f' %\
-                        (epoch, avg_criterion, best_criterion))
 
             if dist_train:
                 dist.barrier()

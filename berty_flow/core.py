@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-
+import numpy as np
 
 class BaseModel(ABC):
     @abstractmethod
@@ -27,11 +27,13 @@ class BaseModel(ABC):
         ...
 
     @abstractmethod
-    def eval_unseen_data(self, tot_res_dict):
+    def configure_optimizers(self):
         ...
 
     @abstractmethod
-    def configure_optimizers(self):
+    def eval_unseen_data(self, tot_res_dict, epoch):
+        # Print evaluation results on validation set
+        # Average loss should be returned
         ...
 
     # TODO need some modification
